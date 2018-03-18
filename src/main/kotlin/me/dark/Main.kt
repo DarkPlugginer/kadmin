@@ -29,6 +29,7 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         instance = this
+        println(1)
         val craftServer = server as CraftServer
 
         val getter = ClassGetter(this)
