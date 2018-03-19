@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 15:57
+ * Modificado em: 19/03/18 20:31
  */
 
 package me.dark.hack.listener
@@ -31,7 +31,7 @@ object HackListener : Listener {
 
     @EventHandler
     fun onPlayerPreLogin(event: AsyncPlayerPreLoginEvent) {
-        if(event.kickMessage.contains("ban")) {
+        if (event.kickMessage.contains("ban")) {
             event.kickMessage = "Res: " + SimpleDateFormat().format(BanAPI().getExpirationDate(event.name))
         }
     }
@@ -45,7 +45,7 @@ object HackListener : Listener {
     fun onInventoryClick(event: InventoryClickEvent) {
         val currentItem = event.currentItem
 
-        if(currentItem != null && currentItem.type == Material.MUSHROOM_SOUP)
+        if (currentItem != null && currentItem.type == Material.MUSHROOM_SOUP)
             check[event.whoClicked.uniqueId]!!.setLastClick()
     }
 
@@ -58,12 +58,12 @@ object HackListener : Listener {
     fun onPlayerInteract(event: PlayerInteractEvent) {
         val player = event.player
 
-        if(event.item != null && event.item.type == Material.MUSHROOM_SOUP) {
+        if (event.item != null && event.item.type == Material.MUSHROOM_SOUP) {
             event.item.type = Material.BOWL
             val autoSoupCheck = check[player.uniqueId]
             autoSoupCheck!!.setLastInteract()
 
-            if(!autoSoupCheck.isLegit(AutoSoupCheck.CheckMoment.INTERACT)) {
+            if (!autoSoupCheck.isLegit(AutoSoupCheck.CheckMoment.INTERACT)) {
                 BanAPI().addBan(player.name, Bukkit.getServer().consoleSender, null, "§cMotivo: §fUso de §c§n§oHACK §fAUTO-SOUP")
                 player.kickPlayer("§cVocê foi banido!" + System.getProperty("line.separator") + "§cMotivo: §fUso de §c§n§oHACK §fAUTO-SOUP")
             }
@@ -75,11 +75,11 @@ object HackListener : Listener {
         val player = event.player
         val itemInHand = player.itemInHand
 
-        if(itemInHand != null && itemInHand.type == Material.MUSHROOM_SOUP) {
+        if (itemInHand != null && itemInHand.type == Material.MUSHROOM_SOUP) {
             val autoSoupCheck = check[player.uniqueId]
             autoSoupCheck!!.setHeld()
 
-            if(!autoSoupCheck.isLegit(AutoSoupCheck.CheckMoment.HELD)) {
+            if (!autoSoupCheck.isLegit(AutoSoupCheck.CheckMoment.HELD)) {
                 BanAPI().addBan(player.name, Bukkit.getServer().consoleSender, null, "cMotivo: §fUso de §c§n§oHACK §fAUTO-SOUP")
                 player.kickPlayer("§cVocê foi banido!" + System.getProperty("line.separator") + "§cMotivo: §fUso de §c§n§oHACK §fAUTO-SOUP")
             }
@@ -95,9 +95,9 @@ object HackListener : Listener {
     fun onEntityDamage(event: EntityDamageEvent) {
         val player = event.entity
 
-        if(player is Player) {
-            if(player.hasMetadata("nfall") && event.cause == EntityDamageEvent.DamageCause.FALL) {
-                if(event.damage < 3.0) {
+        if (player is Player) {
+            if (player.hasMetadata("nfall") && event.cause == EntityDamageEvent.DamageCause.FALL) {
+                if (event.damage < 3.0) {
                     BanAPI().addBan(player.name, Bukkit.getServer().consoleSender, null, "cMotivo: §fUso de §c§n§oHACK §fAUTO-SOUP")
                     player.kickPlayer("§cVocê foi banido!" + System.getProperty("line.separator") + "§cMotivo: §fUso de §c§n§oHACK §fnNo-Fall")
                 } else {

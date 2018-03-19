@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 16:00
+ * Modificado em: 19/03/18 20:31
  */
 
 package me.dark.listener
@@ -12,6 +12,7 @@ package me.dark.listener
 import me.dark.AdminManager
 import me.dark.Main
 import me.dark.hack.BanAPI
+import me.dark.utils.enums.Permission
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -21,23 +22,32 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.*
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.SkullMeta
+import org.bukkit.metadata.FixedMetadataValue
 import java.util.*
 
 object PlayerListener : Listener {
 
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
+        event.joinMessage = null
+
         val player = event.player
 
         Main.adminManager.getAdmins()!!.forEach { uuid: UUID ->
             player.hidePlayer(Bukkit.getPlayer(uuid))
         }
+
+        player.inventory.clear()
     }
 
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
+        event.quitMessage = null
+
         val player = event.player
 
         if (Main.adminManager.getAdmins()!!.contains(player.uniqueId)) {
@@ -46,6 +56,7 @@ object PlayerListener : Listener {
             } else if (Main.adminManager.getAdmins()!!.size == 1) {
                 Main.adminManager.getAdmins()!!.clear()
             }
+            player.inventory.clear()
         }
 
         if (player.hasMetadata("screenshare")) {
@@ -54,8 +65,6 @@ object PlayerListener : Listener {
             blocks.forEach { block: Block ->
                 block.type = Material.AIR
             }
-
-            player.removeMetadata("caged", Main.instance)
 
             val banner = player.getMetadata("screenshare")[0].value() as Player
             BanAPI().addBan(player.name, banner, null, "§cMotivo: §fDeslogou durante uma §eSCREEN-SHARE")
@@ -76,6 +85,26 @@ object PlayerListener : Listener {
                 val name = player.getMetadata("screenshare")[0].value() as String
                 Bukkit.getPlayerExact(name).sendMessage("§f[§eSCREEN-SHARE§f] §c${player.name} §f${event.message}")
             }
+        } else if (player.hasMetadata("report")) {
+            event.isCancelled = true
+
+            Bukkit.getOnlinePlayers().forEach { player1: Player? ->
+                if (Permission.has(Permission.ADMIN_COMMAND, player1!!)) {
+                    player1.resetTitle()
+                    player1.sendTitle("§fNovo §e§o§nReport", "")
+
+                    player1.sendMessage("Player: ${player.name}")
+                    player1.sendMessage("Reportado: ${player.getMetadata("report")[0].value() as String}")
+                    player1.sendMessage("Motivo: ${event.message}")
+                }
+            }
+
+            player.removeMetadata("report", Main.instance)
+
+            for (i in 0 until 100)
+                player.sendMessage(" ")
+
+            player.sendMessage("§fReport enviado com §bsucesso§f!")
         }
     }
 
@@ -109,6 +138,9 @@ object PlayerListener : Listener {
 
                     player.openInventory(inventory)
                 }
+
+                else -> {
+                }
             }
         }
     }
@@ -127,6 +159,9 @@ object PlayerListener : Listener {
 
                     Material.BEDROCK -> {
                         player.performCommand("admin cage ${rightClicked.name}")
+                    }
+
+                    else -> {
                     }
                 }
             }
@@ -159,6 +194,58 @@ object PlayerListener : Listener {
 
                     player.closeInventory()
                 }
+
+                "§b§nReports" -> {
+                    player.closeInventory()
+
+                    val clicked = Bukkit.getPlayerExact(currentItem.itemMeta.displayName.replace("§a", ""))
+                    val inventory = Bukkit.createInventory(player, 27, "§bReports §f- §nMotivos")
+
+                    inventory.setItem(10, createItem("§fReportar por: §b§nNoFall", "", Material.FEATHER, 0, false))
+                    inventory.setItem(12, createItem("§fReportar por: §b§nAutoSoup", "", Material.MUSHROOM_SOUP, 0, false))
+                    inventory.setItem(14, createItem("§fReportar por: §b§nForceField", "", Material.IRON_FENCE, 0, false))
+                    inventory.setItem(26, createItem("§fReportar por outro motivo", "", Material.REDSTONE, 0, false))
+
+                    while (inventory.firstEmpty() != -1)
+                        inventory.setItem(inventory.firstEmpty(), createItem("§akAdmin", "", Material.STAINED_GLASS_PANE, 5, true))
+
+                    player.openInventory(inventory)
+
+                    player.setMetadata("report", FixedMetadataValue(Main.instance, clicked.name))
+                }
+
+                "§bReports §f- §nMotivos" -> {
+                    if (currentItem.type == Material.REDSTONE) {
+                        player.sendMessage("§fPor favor, especifique o motivo no chat")
+                        player.sendMessage(" ")
+
+                        player.closeInventory()
+                        return
+                    }
+
+                    val reason = currentItem.itemMeta.displayName.replace("§fReportar por: §b§n", "")
+
+                    Bukkit.getOnlinePlayers().forEach { player1: Player? ->
+                        if (Permission.has(Permission.ADMIN_COMMAND, player1!!)) {
+                            player1.resetTitle()
+                            player1.sendTitle("§fNovo §e§o§nReport", "")
+
+                            player1.sendMessage("§fNovo §e§oReport")
+                            player1.sendMessage("Player: §c§n${player.name}")
+                            player1.sendMessage("Reportado: §c${player.getMetadata("report")[0].value() as String}")
+                            player1.sendMessage("Motivo: §c$reason")
+                        }
+                    }
+
+                    player.removeMetadata("report", Main.instance)
+
+                    player.closeInventory()
+
+                    player.sendMessage("§fReport enviado com §bsucesso§f!")
+                }
+
+                else -> {
+                }
             }
         }
     }
@@ -167,7 +254,7 @@ object PlayerListener : Listener {
     fun onBlockPlace(event: BlockPlaceEvent) {
         val player = event.player
 
-        if (AdminManager().inAdmin(player.uniqueId) && event.itemInHand.type == Material.BEDROCK && event.itemInHand.hasItemMeta()) {
+        if (AdminManager().inAdmin(player.uniqueId) && event.itemInHand.type == Material.getMaterial(Main.instance!!.config.getString("Schematic.block")) && event.itemInHand.hasItemMeta()) {
             event.isCancelled = true
             player.updateInventory()
         }
@@ -181,5 +268,17 @@ object PlayerListener : Listener {
             event.isCancelled = true
             player.updateInventory()
         }
+    }
+
+    private fun createItem(name: String, desc: String, type: Material, id: Int, hasId: Boolean): ItemStack {
+        var stack = ItemStack(type)
+        if (hasId)
+            stack.durability = id.toShort()
+        var meta: ItemMeta? = stack.itemMeta
+        meta?.displayName = name
+        meta?.lore = Arrays.asList(desc)
+        meta?.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_PLACED_ON)
+        stack.itemMeta = meta
+        return stack
     }
 }

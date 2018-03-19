@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 12:33
+ * Modificado em: 19/03/18 20:31
  */
 
 package me.dark.utils
@@ -27,7 +27,7 @@ class SchematicUtils(val file: File) {
     private var blocks: ByteArray = ByteArray(0)
     private var data: ByteArray = ByteArray(0)
 
-    fun pasteSchematic(location: Location, rmAir: Boolean) : ArrayList<Block> {
+    fun pasteSchematic(location: Location, rmAir: Boolean): ArrayList<Block> {
         var inputStream = FileInputStream(file)
         var tagCompound: NBTTagCompound = NBTCompressedStreamTools.a(inputStream)
 
@@ -46,11 +46,11 @@ class SchematicUtils(val file: File) {
             for (y in 0 until height) {
                 for (z in 0 until length) {
                     var index = y * width * length + z * width + x
-                    val loc = Location(location.world, x + location.x -(width/2), y + location.y, z + location.z - (length/2))
-                    var blocky: Int = blocks[index].toInt() and  0xFF
+                    val loc = Location(location.world, x + location.x - (width / 2), y + location.y, z + location.z - (length / 2))
+                    var blocky: Int = blocks[index].toInt() and 0xFF
 
                     var material: Material = Material.getMaterial(blocky)
-                    if(rmAir && material == Material.AIR)
+                    if (rmAir && material == Material.AIR)
                         continue
 
                     val block: Block = loc.block

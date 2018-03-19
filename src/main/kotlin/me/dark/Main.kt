@@ -4,12 +4,13 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 15:40
+ * Modificado em: 19/03/18 20:31
  */
 
 package me.dark
 
 import me.dark.commands.Commands
+import me.dark.commands.ReportCommand
 import me.dark.commands.common.BaseCommandExecutor
 import me.dark.commands.common.CommandManager
 import me.dark.hack.listener.HackListener
@@ -30,8 +31,8 @@ class Main : JavaPlugin() {
         var schematics: File? = null
     }
 
-    fun getStringInConfig(path: String) : String {
-        if(config.getString(path).contains("&"))
+    fun getStringInConfig(path: String): String {
+        if (config.getString(path).contains("&"))
             return ChatColor.translateAlternateColorCodes('&', config.getString(path))
         return config.getString(path)
     }
@@ -40,6 +41,8 @@ class Main : JavaPlugin() {
         instance = this
         val craftServer = server as CraftServer
         craftServer.commandMap.register("admin", BaseCommandExecutor())
+        if (config.getBoolean("Report"))
+            craftServer.commandMap.register("report", ReportCommand())
 
         CommandManager.register(Commands::class)
 
@@ -59,7 +62,7 @@ class Main : JavaPlugin() {
         saveConfig()
 
         schematics = File(dataFolder, File.separator + "schematics")
-        if(!schematics!!.exists()) {
+        if (!schematics!!.exists()) {
             schematics!!.mkdirs()
         }
 
@@ -79,9 +82,9 @@ class Main : JavaPlugin() {
             val buf = ByteArray(1024)
             var len: Int
 
-            while(true) {
+            while (true) {
                 len = input.read(buf)
-                if(len < 0) break
+                if (len < 0) break
                 out.write(buf, 0, len)
             }
 

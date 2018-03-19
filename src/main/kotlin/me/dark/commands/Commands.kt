@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 16:06
+ * Modificado em: 19/03/18 20:31
  */
 
 package me.dark.commands
@@ -23,6 +23,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.metadata.FixedMetadataValue
 import java.io.File
+import java.util.*
 
 class Commands {
 
@@ -111,12 +112,7 @@ class Commands {
         targetPlayer.chat(allArgs)
     }
 
-    @BaseCommand(usage = "[jogador] [motivo]", aliases = ["report", "rep"], desc = "Comando usado para reportar um jogador", permission = Permission.NONE, min = 1, max = 1)
-    fun reportCommand(sender: CommandSender, commandLabel: String, strings: Array<String>) {
-        if (sender !is Player) return
-    }
-
-    @BaseCommand(usage = "[jogador]", aliases = ["sc", "screenshare"], desc = "Comando usado puxar um jogador para ScreenShare", permission = Permission.NONE, min = 1, max = 1)
+    @BaseCommand(usage = "[jogador]", aliases = ["ss", "screenshare"], desc = "Comando usado puxar um jogador para ScreenShare", permission = Permission.NONE, min = 1, max = 1)
     fun screenShareCommand(sender: CommandSender, commandLabel: String, strings: Array<String>) {
         if (sender !is Player) return
 
@@ -126,6 +122,7 @@ class Commands {
         }
 
         val targetPlayer: Player = Bukkit.getPlayerExact(strings[0])
+
         if (sender.hasMetadata("sc")) {
             sender.performCommand("admin cage ${targetPlayer.name}")
             targetPlayer.removeMetadata("screenshare", Main.instance)
@@ -142,12 +139,12 @@ class Commands {
                     targetPlayer.showPlayer(targetPlayer)
             }
         } else {
-            sender.performCommand("cage ${targetPlayer.name}")
+            sender.performCommand("admin cage ${targetPlayer.name}")
 
             targetPlayer.setMetadata("screenshare", FixedMetadataValue(Main.instance, sender.name))
 
             targetPlayer.sendMessage("${CommandManager.light} Você foi puxado para uma ${CommandManager.warning}screen-share. " + System.getProperty("line.separator") + "${CommandManager.light} Caso deslogue será banido automaticamente")
-            sender.sendMessage("${CommandManager.light} Você puxou o jogador${CommandManager.error}${targetPlayer.name} ${CommandManager.light} Para uma Screen-Share")
+            sender.sendMessage("${CommandManager.light} Você puxou o jogador ${CommandManager.error}${targetPlayer.name} ${CommandManager.light} Para uma Screen-Share")
 
             sender.setMetadata("sc", FixedMetadataValue(Main.instance, targetPlayer.name))
 

@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 15:30
+ * Modificado em: 19/03/18 20:31
  */
 
 package me.dark
@@ -29,7 +29,7 @@ class AdminManager {
 
     @Suppress("DEPRECATION")
     fun set(player: Player) {
-        if(admins?.contains(player.uniqueId)!!) {
+        if (admins?.contains(player.uniqueId)!!) {
             admins.remove(player.uniqueId)
 
             player.inventory.clear()
@@ -38,10 +38,11 @@ class AdminManager {
             player.inventory.contents = inventory[player.uniqueId]!![0]
             player.inventory.armorContents = inventory[player.uniqueId]!![1]
 
+            player.resetTitle()
             player.sendTitle("§fModo §c§nADMIN", "§eSaiu")
 
             Bukkit.getOnlinePlayers().forEach { player1: Player? ->
-                if(!player1?.canSee(player)!!)
+                if (!player1?.canSee(player)!!)
                     player1.showPlayer(player)
             }
 
@@ -62,7 +63,9 @@ class AdminManager {
                 player1?.hidePlayer(player)
             }
 
+            player.resetTitle()
             player.sendTitle("§fModo §c§nADMIN", "§aEntrou")
+
             player.gameMode = GameMode.CREATIVE
 
             player.inventory.setItem(3, createItem("§eJogadores", "§fLista de jogadores online", Material.SLIME_BALL))
@@ -72,15 +75,15 @@ class AdminManager {
         }
     }
 
-    fun getAdmins() : ArrayList<UUID>? {
+    fun getAdmins(): ArrayList<UUID>? {
         return admins
     }
 
-    fun inAdmin(uniqueId: UUID) : Boolean {
+    fun inAdmin(uniqueId: UUID): Boolean {
         return getAdmins()!!.contains(uniqueId)
     }
 
-    private fun createItem(name: String, desc: String, type: Material) : ItemStack {
+    private fun createItem(name: String, desc: String, type: Material): ItemStack {
         var stack = ItemStack(type)
         var meta: ItemMeta? = stack.itemMeta
         meta?.displayName = name
