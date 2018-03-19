@@ -1,9 +1,14 @@
-package me.dark.hack;
+/*
+ * Copyright (©) Nano Team
+ *
+ * Projeto desenvolvido por Miguel Lukas
+ * Todos os direitos Reservados
+ *
+ * Modificado em: 18/03/18 21:01
+ * Criado em: 18/03/18 21:02
+ */
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+package me.dark.hack;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.BanEntry;
@@ -11,6 +16,11 @@ import org.bukkit.BanList;
 import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class BanAPI {
 
@@ -157,10 +167,7 @@ public class BanAPI {
         final BanEntry entry = Bukkit.getBanList(Type.NAME).getBanEntry(target);
         Validate.notNull(entry, "Cannot find BanList entry \"" + target + "\"");
         final long currentTime = System.currentTimeMillis(); //Gets the current time
-        if (getExpirationLong(target) > currentTime) {
-            return false;
-        }
-        return true;
+        return getExpirationLong(target) <= currentTime;
     }
 
     /**

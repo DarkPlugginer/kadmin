@@ -1,3 +1,13 @@
+/*
+ * Copyright (©) Nano Team
+ *
+ * Projeto desenvolvido por Miguel Lukas
+ * Todos os direitos Reservados
+ *
+ * Modificado em: 18/03/18 21:01
+ * Criado em: 18/03/18 21:02
+ */
+
 package me.dark
 
 import me.dark.hack.listener.HackListener
@@ -69,6 +79,7 @@ class Main : JavaPlugin() {
         super.onDisable()
     }
 
+
     private fun copyFile(input: InputStream, arquivo: File) {
         try {
             val out = FileOutputStream(arquivo)
@@ -80,7 +91,7 @@ class Main : JavaPlugin() {
                 if(len < 0) break
                 out.write(buf, 0, len)
             }
- 
+
             out.close()
             input.close()
         } catch (e: Exception) {

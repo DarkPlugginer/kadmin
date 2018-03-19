@@ -1,3 +1,13 @@
+/*
+ * Copyright (©) Nano Team
+ *
+ * Projeto desenvolvido por Miguel Lukas
+ * Todos os direitos Reservados
+ *
+ * Modificado em: 18/03/18 21:01
+ * Criado em: 18/03/18 21:02
+ */
+
 package me.dark.hack.listener
 import me.dark.Main
 import me.dark.hack.BanAPI

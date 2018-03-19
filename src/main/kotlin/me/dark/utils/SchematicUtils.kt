@@ -1,3 +1,13 @@
+/*
+ * Copyright (©) Nano Team
+ *
+ * Projeto desenvolvido por Miguel Lukas
+ * Todos os direitos Reservados
+ *
+ * Modificado em: 18/03/18 21:01
+ * Criado em: 18/03/18 21:02
+ */
+
 package me.dark.utils
 
 import net.minecraft.server.v1_8_R3.NBTCompressedStreamTools

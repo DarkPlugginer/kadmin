@@ -1,7 +1,16 @@
+/*
+ * Copyright (©) Nano Team
+ *
+ * Projeto desenvolvido por Miguel Lukas
+ * Todos os direitos Reservados
+ *
+ * Modificado em: 18/03/18 21:01
+ * Criado em: 18/03/18 21:02
+ */
+
 package me.dark.commands
 
 import me.dark.AdminManager
-import me.dark.Main
 import me.dark.utils.enums.CommandsMessages
 import me.dark.utils.enums.ConsoleMessage
 import org.bukkit.command.CommandSender
