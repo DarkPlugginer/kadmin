@@ -1,15 +1,15 @@
 /*
- * Copyright (©) Nano Team
+ * Copyright (©) kadmin
  *
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 18/03/18 21:01
- * Criado em: 18/03/18 21:02
+ * Modificado em: 19/03/18 15:07
  */
 
 package me.dark.listener
 
+import me.dark.AdminManager
 import me.dark.Main
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -17,10 +17,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.PlayerInteractEntityEvent
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
 import java.util.*
@@ -66,7 +63,8 @@ object PlayerListener : Listener {
 
                     Bukkit.getOnlinePlayers().forEach { player1: Player? ->
                         if(!Main.adminManager.inAdmin(player1!!.uniqueId)) {
-                            var head = ItemStack(Material.SKULL_ITEM, 3)
+                            var head = ItemStack(Material.SKULL_ITEM)
+                            head.durability = 3.toShort()
                             var meta = head.itemMeta as SkullMeta
                             meta.owner = player1.name
                             meta.displayName = "§a" + player1.name
@@ -95,7 +93,7 @@ object PlayerListener : Listener {
                     }
 
                     Material.BEDROCK -> {
-                        player.performCommand("cage ${rightClicked.name}")
+                        player.performCommand("admin cage ${rightClicked.name}")
                     }
                 }
             }
@@ -117,11 +115,11 @@ object PlayerListener : Listener {
                 "§b§nJogadores" -> {
                     val clicked = Bukkit.getPlayerExact(currentItem.itemMeta.displayName.replace("§a", ""))
 
-                    if(event.click.name.toLowerCase().contains("right")) {
+                    if (event.click.name.toLowerCase().contains("left")) {
                         player.teleport(clicked.location)
-                    } else if (event.click.name.toLowerCase().contains("left")) {
-                        player.performCommand("cage ${clicked.name}")
-                        player.teleport(clicked.location.add(0.0, 2.0, -2.0))
+                    } else if (event.click.name.toLowerCase().contains("right")) {
+                        player.performCommand("admin cage ${clicked.name}")
+                        player.teleport(clicked.location.add(0.0, 0.0, -3.0))
 
                         player.sendMessage("§fVocê prendeu o jogador: §c§o§n" + clicked.name)
                     }
@@ -129,6 +127,16 @@ object PlayerListener : Listener {
                     player.closeInventory()
                 }
             }
+        }
+    }
+
+    @EventHandler
+    fun onPlayerDropItem(event: PlayerDropItemEvent) {
+        val player = event.player
+
+        if (AdminManager().inAdmin(player.uniqueId)) {
+            event.isCancelled = true
+            player.updateInventory()
         }
     }
 }

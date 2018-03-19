@@ -1,21 +1,21 @@
 /*
- * Copyright (©) Nano Team
+ * Copyright (©) kadmin
  *
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 18/03/18 21:01
- * Criado em: 18/03/18 21:02
+ * Modificado em: 19/03/18 15:05
  */
 
 package me.dark
 
+import me.dark.commands.Commands
+import me.dark.commands.common.BaseCommandExecutor
+import me.dark.commands.common.CommandManager
 import me.dark.hack.listener.HackListener
 import me.dark.listener.PlayerListener
-import me.dark.utils.ClassGetter
 import org.bukkit.ChatColor
 import org.bukkit.Material
-import org.bukkit.command.Command
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
@@ -30,7 +30,6 @@ class Main : JavaPlugin() {
         var schematics: File? = null
     }
 
-
     fun getStringInConfig(path: String) : String {
         if(config.getString(path).contains("&"))
             return ChatColor.translateAlternateColorCodes('&', config.getString(path))
@@ -39,25 +38,18 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         instance = this
-        println()
         val craftServer = server as CraftServer
+        craftServer.commandMap.register("admin", BaseCommandExecutor())
 
-        val getter = ClassGetter(this)
-        for (clazz in getter.getClassesForPackage("me.dark.commands")) {
-            craftServer.commandMap.register(clazz.simpleName.toLowerCase().replace("command", ""), clazz.newInstance() as Command?)
-        }
+        CommandManager.register(Commands::class)
 
         server.pluginManager.registerEvents(PlayerListener, this)
         server.pluginManager.registerEvents(HackListener, this)
 
         config.addDefault("Permissions.adminCommand", "comando.admin")
-        config.addDefault("Permissions.sumoCommand", "comando.sumo")
+        config.addDefault("Permissions.sudoCommand", "comando.sudo")
         config.addDefault("Permissions.cageCommand", "comando.cage")
-        config.addDefault("Usages.cageUsage", "Use /cage jogador")
-        config.addDefault("Usages.sumoUsage", "Use /sumo jogador mensagem")
-        config.addDefault("Erros.consoleError", "Apenas jogadores!")
-        config.addDefault("Erros.cageError", "Erro, este jogador é inválido")
-        config.addDefault("Erros.sumoError", "Erro, este jogador é inválido")
+        config.addDefault("Permissions.hacktestCommand", "comando.htest")
         config.addDefault("Schematic.name", "jail.schematic")
         config.addDefault("Schematic.block", Material.QUARTZ_BLOCK.name)
 
@@ -78,7 +70,6 @@ class Main : JavaPlugin() {
         saveConfig()
         super.onDisable()
     }
-
 
     private fun copyFile(input: InputStream, arquivo: File) {
         try {

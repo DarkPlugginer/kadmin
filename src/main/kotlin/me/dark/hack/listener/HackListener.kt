@@ -1,11 +1,10 @@
 /*
- * Copyright (©) Nano Team
+ * Copyright (©) kadmin
  *
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 18/03/18 21:01
- * Criado em: 18/03/18 21:02
+ * Modificado em: 19/03/18 12:33
  */
 
 package me.dark.hack.listener
