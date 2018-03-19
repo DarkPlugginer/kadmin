@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 15:05
+ * Modificado em: 19/03/18 15:40
  */
 
 package me.dark
@@ -50,8 +50,10 @@ class Main : JavaPlugin() {
         config.addDefault("Permissions.sudoCommand", "comando.sudo")
         config.addDefault("Permissions.cageCommand", "comando.cage")
         config.addDefault("Permissions.hacktestCommand", "comando.htest")
+        config.addDefault("Permissions.screenShare", "comando.sc")
         config.addDefault("Schematic.name", "jail.schematic")
         config.addDefault("Schematic.block", Material.QUARTZ_BLOCK.name)
+        config.addDefault("Report", true)
 
         config.options().copyDefaults(true)
         saveConfig()

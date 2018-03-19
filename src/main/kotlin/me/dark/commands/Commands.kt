@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 15:05
+ * Modificado em: 19/03/18 16:00
  */
 
 package me.dark.commands
@@ -44,18 +44,31 @@ class Commands {
 
         var targetPlayer: Player = Bukkit.getPlayerExact(strings[0])
 
-        val schematicUtils = SchematicUtils(File(Main.schematics, Main.instance!!.config.getString("Schematic.name")))
-        val blocks: ArrayList<Block> = schematicUtils.pasteSchematic(targetPlayer.location.add(0.0, 10.0, 0.0), true)
-        var found = false
-        blocks.forEach { block: Block ->
-            if (block.type == Material.getMaterial(Main.instance!!.config.getString("Schematic.block"))) {
-                targetPlayer.teleport(getCenter(block.location.add(0.0, 1.0, 0.0)))
-                found = true
-                return@forEach
+        if (targetPlayer.hasMetadata("caged")) {
+            val blocks: ArrayList<Block> = targetPlayer.getMetadata("caged")[0].value() as ArrayList<Block>
+
+            blocks.forEach { block: Block ->
+                block.type = Material.AIR
             }
-        }
-        if (!found) {
-            targetPlayer.teleport(getCenter(targetPlayer.location.add(0.0, 11.0, 0.0)))
+
+            targetPlayer.teleport(targetPlayer.location.subtract(0.0, 11.0, 0.0))
+            targetPlayer.removeMetadata("caged", Main.instance)
+        } else {
+            val schematicUtils = SchematicUtils(File(Main.schematics, Main.instance!!.config.getString("Schematic.name")))
+            val blocks: ArrayList<Block> = schematicUtils.pasteSchematic(targetPlayer.location.add(0.0, 10.0, 0.0), true)
+            var found = false
+            blocks.forEach { block: Block ->
+                if (block.type == Material.getMaterial(Main.instance!!.config.getString("Schematic.block"))) {
+                    targetPlayer.teleport(getCenter(block.location.add(0.0, 1.0, 0.0)))
+                    found = true
+                    return@forEach
+                }
+            }
+            if (!found) {
+                targetPlayer.teleport(getCenter(targetPlayer.location.add(0.0, 11.0, 0.0)))
+            }
+
+            targetPlayer.setMetadata("caged", FixedMetadataValue(Main.instance, blocks))
         }
     }
 
@@ -98,7 +111,48 @@ class Commands {
         targetPlayer.chat(allArgs)
     }
 
-    //TODO: tools
+    @BaseCommand(usage = "[jogador] [motivo]", aliases = ["report", "rep"], desc = "Comando usado para reportar um jogador", permission = Permission.NONE, min = 1, max = 1)
+    fun reportCommand(sender: CommandSender, commandLabel: String, strings: Array<String>) {
+        if (sender !is Player) return
+    }
+
+    @BaseCommand(usage = "[jogador]", aliases = ["sc", "screenshare"], desc = "Comando usado puxar um jogador para ScreenShare", permission = Permission.NONE, min = 1, max = 1)
+    fun screenShareCommand(sender: CommandSender, commandLabel: String, strings: Array<String>) {
+        if (sender !is Player) return
+
+        if (Bukkit.getPlayerExact(strings[0]) == null) {
+            sender.sendMessage("${CommandManager.error} Este jogador não pode ser encontrado!")
+            return
+        }
+
+        var targetPlayer: Player = Bukkit.getPlayerExact(strings[0])
+        if (sender.hasMetadata("sc")) {
+            sender.performCommand("admin cage ${targetPlayer.name}")
+            targetPlayer.removeMetadata("screenshare", Main.instance)
+            sender.removeMetadata("sc", Main.instance)
+
+            sender.sendMessage("§eScreen-Share terminada")
+            targetPlayer.sendMessage("§eScreen-Share terminada")
+        } else {
+            sender.performCommand("cage ${targetPlayer.name}")
+
+            targetPlayer.setMetadata("screenshare", FixedMetadataValue(Main.instance, sender.name))
+
+            targetPlayer.sendMessage("${CommandManager.light} Você foi puxado para uma ${CommandManager.warning}screen-share. " + System.getProperty("line.separator") + "${CommandManager.light} Caso deslogue será banido automaticamente")
+            sender.sendMessage("${CommandManager.light} Você puxou o jogador${CommandManager.error}${targetPlayer.name} ${CommandManager.light} Para uma Screen-Share")
+
+            sender.setMetadata("sc", FixedMetadataValue(Main.instance, targetPlayer.name))
+
+            for (onlinePlayer in Bukkit.getOnlinePlayers()) {
+                if (onlinePlayer == sender)
+                    continue
+
+                targetPlayer.hidePlayer(onlinePlayer)
+                sender.hidePlayer(onlinePlayer)
+            }
+        }
+    }
+
     private fun getCenter(loc: Location): Location {
         return Location(loc.world,
                 getRelativeCord(loc.blockX),

@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 15:05
+ * Modificado em: 19/03/18 15:40
  */
 
 package me.dark.utils.enums
@@ -18,7 +18,8 @@ enum class Permission {
     ADMIN_COMMAND,
     CAGE_COMMAND,
     HACKTEST_COMMAND,
-    SUDO_COMMAND;
+    SUDO_COMMAND,
+    SCREEN_SHARE;
 
     companion object {
 

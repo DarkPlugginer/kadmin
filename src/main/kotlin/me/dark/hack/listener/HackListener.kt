@@ -4,10 +4,11 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 12:33
+ * Modificado em: 19/03/18 15:57
  */
 
 package me.dark.hack.listener
+
 import me.dark.Main
 import me.dark.hack.BanAPI
 import me.dark.hack.checker.AutoSoupCheck
@@ -63,7 +64,7 @@ object HackListener : Listener {
             autoSoupCheck!!.setLastInteract()
 
             if(!autoSoupCheck.isLegit(AutoSoupCheck.CheckMoment.INTERACT)) {
-                BanAPI().addBan(player.name, Bukkit.getServer().consoleSender, null, "cMotivo: §fUso de §c§n§oHACK §fAUTO-SOUP")
+                BanAPI().addBan(player.name, Bukkit.getServer().consoleSender, null, "§cMotivo: §fUso de §c§n§oHACK §fAUTO-SOUP")
                 player.kickPlayer("§cVocê foi banido!" + System.getProperty("line.separator") + "§cMotivo: §fUso de §c§n§oHACK §fAUTO-SOUP")
             }
         }

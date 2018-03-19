@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 12:33
+ * Modificado em: 19/03/18 15:30
  */
 
 package me.dark
@@ -66,7 +66,7 @@ class AdminManager {
             player.gameMode = GameMode.CREATIVE
 
             player.inventory.setItem(3, createItem("§eJogadores", "§fLista de jogadores online", Material.SLIME_BALL))
-            player.inventory.setItem(4, createItem("§eJail", "§fPrenda um jogador", Material.BEDROCK))
+            player.inventory.setItem(4, createItem("§eJail", "§fPrenda um jogador", Material.getMaterial(Main.instance!!.config.getString("Schematic.block"))))
 
             player.updateInventory()
         }
