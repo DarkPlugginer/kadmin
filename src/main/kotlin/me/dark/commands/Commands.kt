@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 16:00
+ * Modificado em: 19/03/18 16:05
  */
 
 package me.dark.commands
@@ -42,7 +42,7 @@ class Commands {
             return
         }
 
-        var targetPlayer: Player = Bukkit.getPlayerExact(strings[0])
+        val targetPlayer: Player = Bukkit.getPlayerExact(strings[0])
 
         if (targetPlayer.hasMetadata("caged")) {
             val blocks: ArrayList<Block> = targetPlayer.getMetadata("caged")[0].value() as ArrayList<Block>
@@ -81,7 +81,7 @@ class Commands {
             return
         }
 
-        var targetPlayer: Player = Bukkit.getPlayerExact(strings[0])
+        val targetPlayer: Player = Bukkit.getPlayerExact(strings[0])
         sender.setMetadata("hacktest", FixedMetadataValue(Main.instance, targetPlayer))
 
         val inventory = Bukkit.createInventory(sender, 36, "§b§nHack-Test")
@@ -98,7 +98,7 @@ class Commands {
             return
         }
 
-        var targetPlayer: Player = Bukkit.getPlayerExact(strings[0])
+        val targetPlayer: Player = Bukkit.getPlayerExact(strings[0])
 
         val builder = StringBuilder()
         for (i in 1 until strings.size) {
@@ -125,7 +125,7 @@ class Commands {
             return
         }
 
-        var targetPlayer: Player = Bukkit.getPlayerExact(strings[0])
+        val targetPlayer: Player = Bukkit.getPlayerExact(strings[0])
         if (sender.hasMetadata("sc")) {
             sender.performCommand("admin cage ${targetPlayer.name}")
             targetPlayer.removeMetadata("screenshare", Main.instance)
@@ -133,6 +133,14 @@ class Commands {
 
             sender.sendMessage("§eScreen-Share terminada")
             targetPlayer.sendMessage("§eScreen-Share terminada")
+
+            for (onlinePlayer in Bukkit.getOnlinePlayers()) {
+                if (!sender.canSee(onlinePlayer))
+                    sender.showPlayer(onlinePlayer)
+
+                if (!targetPlayer.canSee(targetPlayer))
+                    targetPlayer.showPlayer(targetPlayer)
+            }
         } else {
             sender.performCommand("cage ${targetPlayer.name}")
 
