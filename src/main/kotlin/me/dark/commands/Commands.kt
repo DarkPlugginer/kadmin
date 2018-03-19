@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 16:05
+ * Modificado em: 19/03/18 16:06
  */
 
 package me.dark.commands
@@ -135,7 +135,7 @@ class Commands {
             targetPlayer.sendMessage("§eScreen-Share terminada")
 
             for (onlinePlayer in Bukkit.getOnlinePlayers()) {
-                if (!sender.canSee(onlinePlayer))
+                if (!sender.canSee(onlinePlayer))/**/
                     sender.showPlayer(onlinePlayer)
 
                 if (!targetPlayer.canSee(targetPlayer))
