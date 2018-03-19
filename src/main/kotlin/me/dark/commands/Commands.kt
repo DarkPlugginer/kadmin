@@ -135,7 +135,7 @@ class Commands {
             targetPlayer.sendMessage("§eScreen-Share terminada")
 
             for (onlinePlayer in Bukkit.getOnlinePlayers()) {
-                if (!sender.canSee(onlinePlayer))/**/
+                if (!sender.canSee(onlinePlayer))
                     sender.showPlayer(onlinePlayer)
 
                 if (!targetPlayer.canSee(targetPlayer))
