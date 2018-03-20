@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 20:31
+ * Modificado em: 19/03/18 20:36
  */
 
 package me.dark.listener
@@ -66,8 +66,10 @@ object PlayerListener : Listener {
                 block.type = Material.AIR
             }
 
-            val banner = player.getMetadata("screenshare")[0].value() as Player
+            val banner = Bukkit.getPlayerExact(player.getMetadata("screenshare")[0].value() as String)
             BanAPI().addBan(player.name, banner, null, "§cMotivo: §fDeslogou durante uma §eSCREEN-SHARE")
+
+            player.removeMetadata("screenshare", Main.instance)
         }
     }
 
