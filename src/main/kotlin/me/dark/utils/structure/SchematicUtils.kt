@@ -4,10 +4,10 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 20:31
+ * Modificado em: 22/03/18 18:50
  */
 
-package me.dark.utils
+package me.dark.utils.structure
 
 import net.minecraft.server.v1_8_R3.NBTCompressedStreamTools
 import net.minecraft.server.v1_8_R3.NBTTagCompound
@@ -28,8 +28,8 @@ class SchematicUtils(val file: File) {
     private var data: ByteArray = ByteArray(0)
 
     fun pasteSchematic(location: Location, rmAir: Boolean): ArrayList<Block> {
-        var inputStream = FileInputStream(file)
-        var tagCompound: NBTTagCompound = NBTCompressedStreamTools.a(inputStream)
+        val inputStream = FileInputStream(file)
+        val tagCompound: NBTTagCompound = NBTCompressedStreamTools.a(inputStream)
 
         width = tagCompound.getShort("Width")
         length = tagCompound.getShort("Length")
@@ -40,16 +40,16 @@ class SchematicUtils(val file: File) {
 
         inputStream.close()
 
-        var list: ArrayList<Block> = ArrayList()
+        val list: ArrayList<Block> = ArrayList()
 
         for (x in 0 until width) {
             for (y in 0 until height) {
                 for (z in 0 until length) {
-                    var index = y * width * length + z * width + x
+                    val index = y * width * length + z * width + x
                     val loc = Location(location.world, x + location.x - (width / 2), y + location.y, z + location.z - (length / 2))
-                    var blocky: Int = blocks[index].toInt() and 0xFF
+                    val blocky: Int = blocks[index].toInt() and 0xFF
 
-                    var material: Material = Material.getMaterial(blocky)
+                    val material: Material = Material.getMaterial(blocky)
                     if (rmAir && material == Material.AIR)
                         continue
 
@@ -60,6 +60,7 @@ class SchematicUtils(val file: File) {
                 }
             }
         }
+
         return list
     }
 }

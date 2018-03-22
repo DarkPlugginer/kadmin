@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 21:03
+ * Modificado em: 20/03/18 13:52
  */
 
 package me.dark.commands
@@ -26,26 +26,24 @@ class ReportCommand : BukkitCommand("report") {
 
         var slots = 0
 
-        if (Bukkit.getOnlinePlayers().size <= 27) {
-            slots = 27
-        } else if (Bukkit.getOnlinePlayers().size in 28..36) {
-            slots = 36
-        } else if (Bukkit.getOnlinePlayers().size in 37..55) {
-            slots = 54
+        when {
+            Bukkit.getOnlinePlayers().size <= 27 -> slots = 27
+            Bukkit.getOnlinePlayers().size in 28..36 -> slots = 36
+            Bukkit.getOnlinePlayers().size in 37..55 -> slots = 54
         }
 
         val inventory = Bukkit.createInventory(commandSender, slots, "§b§nReports")
 
         Bukkit.getOnlinePlayers().forEach { player1: Player? ->
-            if (!Main.adminManager.inAdmin(player1!!.uniqueId)) {
-            var head = ItemStack(Material.SKULL_ITEM)
-            head.durability = 3.toShort()
-            var meta = head.itemMeta as SkullMeta
+            if (!Main.adminManager.inAdmin(player1!!.uniqueId) && player1 != commandSender) {
+                var head = ItemStack(Material.SKULL_ITEM)
+                head.durability = 3.toShort()
+                var meta = head.itemMeta as SkullMeta
                 meta.owner = player1.name
-            meta.displayName = "§a" + player1.name
-            meta.lore = Arrays.asList("", "§fClique para §cReportar")
-            head.itemMeta = meta
-            inventory.setItem(inventory.firstEmpty(), head)
+                meta.displayName = "§a" + player1.name
+                meta.lore = Arrays.asList("", "§fClique para §cReportar")
+                head.itemMeta = meta
+                inventory.setItem(inventory.firstEmpty(), head)
             }
         }
 

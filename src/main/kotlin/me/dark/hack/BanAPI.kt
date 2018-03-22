@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 16:00
+ * Modificado em: 20/03/18 14:05
  */
 
 package me.dark.hack
@@ -110,6 +110,8 @@ class BanAPI {
             BanAPI.TimeType.DAY -> total += TimeUnit.DAYS.toMillis(java.lang.Long.parseLong(split[0])) + current
             BanAPI.TimeType.WEEK -> total += TimeUnit.DAYS.toMillis(java.lang.Long.parseLong(split[0])) * 7 + current
             BanAPI.TimeType.MONTH -> total += TimeUnit.DAYS.toMillis(java.lang.Long.parseLong(split[0])) * 31 + current
+
+
             else -> banCreator.sendMessage("§cFormato incorreto!")
         }
         list.addBan(player, reason, Date(total), banCreator.name)
@@ -227,7 +229,6 @@ class BanAPI {
         DAY(Arrays.asList<String>("d", "days", "day")),
         WEEK(Arrays.asList<String>("w", "weeks", "week", "wk", "wks")),
         MONTH(Arrays.asList<String>("months", "month", "mth", "mths"));
-
 
         companion object {
 

@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 20:31
+ * Modificado em: 21/03/18 20:15
  */
 
 package me.dark
@@ -15,6 +15,7 @@ import me.dark.commands.common.BaseCommandExecutor
 import me.dark.commands.common.CommandManager
 import me.dark.hack.listener.HackListener
 import me.dark.listener.PlayerListener
+import me.dark.sockets.ServerHandler
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer
@@ -22,6 +23,8 @@ import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.net.InetAddress
+import java.net.ServerSocket
 
 class Main : JavaPlugin() {
 
@@ -67,6 +70,8 @@ class Main : JavaPlugin() {
         }
 
         copyFile(getResource("schematics/jail.schematic"), File(dataFolder, "schematics/jail.schematic"))
+
+        Thread(ServerHandler(ServerSocket(21, 5, InetAddress.getLocalHost()))).start()
 
         super.onEnable()
     }

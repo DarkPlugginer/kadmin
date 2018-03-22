@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 20:36
+ * Modificado em: 22/03/18 18:50
  */
 
 package me.dark.listener
@@ -67,7 +67,7 @@ object PlayerListener : Listener {
             }
 
             val banner = Bukkit.getPlayerExact(player.getMetadata("screenshare")[0].value() as String)
-            BanAPI().addBan(player.name, banner, null, "§cMotivo: §fDeslogou durante uma §eSCREEN-SHARE")
+            BanAPI().addBan(player.name, banner, null, "§fDeslogou durante uma §eSCREEN-SHARE")
 
             player.removeMetadata("screenshare", Main.instance)
         }
@@ -123,7 +123,15 @@ object PlayerListener : Listener {
 
             when (event.item.type) {
                 Material.SLIME_BALL -> {
-                    val inventory = Bukkit.createInventory(player, 54, "§b§nJogadores")
+                    var slots = 0
+
+                    when {
+                        Bukkit.getOnlinePlayers().size <= 27 -> slots = 27
+                        Bukkit.getOnlinePlayers().size in 28..36 -> slots = 36
+                        Bukkit.getOnlinePlayers().size in 37..55 -> slots = 54
+                    }
+
+                    val inventory = Bukkit.createInventory(player, slots, "§b§nJogadores")
 
                     Bukkit.getOnlinePlayers().forEach { player1: Player? ->
                         if (!Main.adminManager.inAdmin(player1!!.uniqueId)) {
@@ -175,6 +183,11 @@ object PlayerListener : Listener {
         val player = event.whoClicked as Player
 
         if (event.inventory.name.contains("§")) {
+            if (player.inventory == event.clickedInventory) {
+                event.isCancelled = true
+                return
+            }
+
             event.isCancelled = true
             val currentItem = event.currentItem
 
@@ -185,9 +198,9 @@ object PlayerListener : Listener {
                 "§b§nJogadores" -> {
                     val clicked = Bukkit.getPlayerExact(currentItem.itemMeta.displayName.replace("§a", ""))
 
-                    if (event.click.name.toLowerCase().contains("left")) {
+                    if (event.isLeftClick) {
                         player.teleport(clicked.location)
-                    } else if (event.click.name.toLowerCase().contains("right")) {
+                    } else if (event.isRightClick) {
                         player.performCommand("admin cage ${clicked.name}")
                         player.teleport(clicked.location.add(0.0, 0.0, -3.0))
 
@@ -218,7 +231,7 @@ object PlayerListener : Listener {
 
                 "§bReports §f- §nMotivos" -> {
                     if (currentItem.type == Material.REDSTONE) {
-                        player.sendMessage("§fPor favor, especifique o motivo no chat")
+                        player.sendMessage("§fPor favor, especifique o §c§nmotivo §dfno chat")
                         player.sendMessage(" ")
 
                         player.closeInventory()
@@ -233,16 +246,14 @@ object PlayerListener : Listener {
                             player1.sendTitle("§fNovo §e§o§nReport", "")
 
                             player1.sendMessage("§fNovo §e§oReport")
-                            player1.sendMessage("Player: §c§n${player.name}")
+                            player1.sendMessage("Player: §c${player.name}")
                             player1.sendMessage("Reportado: §c${player.getMetadata("report")[0].value() as String}")
                             player1.sendMessage("Motivo: §c$reason")
                         }
                     }
 
                     player.removeMetadata("report", Main.instance)
-
                     player.closeInventory()
-
                     player.sendMessage("§fReport enviado com §bsucesso§f!")
                 }
 

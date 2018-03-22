@@ -4,17 +4,16 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 20:31
+ * Modificado em: 22/03/18 18:50
  */
 
 package me.dark.commands
 
-import me.dark.AdminManager
 import me.dark.Main
 import me.dark.commands.common.BaseCommand
 import me.dark.commands.common.CommandManager
-import me.dark.utils.SchematicUtils
 import me.dark.utils.enums.Permission
+import me.dark.utils.structure.SchematicUtils
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -26,13 +25,6 @@ import java.io.File
 import java.util.*
 
 class Commands {
-
-    @BaseCommand(usage = "admin", aliases = ["adm", "admin"], desc = "Comando usado para acessar o modo admin", hidden = false, permission = Permission.ADMIN_COMMAND)
-    fun adminCommand(sender: CommandSender, commandLabel: String, strings: Array<String>) {
-        if (sender is Player) {
-            AdminManager().set(sender)
-        }
-    }
 
     @BaseCommand(usage = "[jogador]", aliases = ["cage", "cg"], desc = "Comando usado para prender um jogador", permission = Permission.CAGE_COMMAND, min = 1, max = 1)
     fun cageCommand(sender: CommandSender, commandLabel: String, strings: Array<String>) {
@@ -60,7 +52,7 @@ class Commands {
             var found = false
             blocks.forEach { block: Block ->
                 if (block.type == Material.getMaterial(Main.instance!!.config.getString("Schematic.block"))) {
-                    targetPlayer.teleport(getCenter(block.location.add(0.0, 1.0, 0.0)))
+                    targetPlayer.teleport(getCenter(block.location).add(0.0, 1.0, 0.0))
                     found = true
                     return@forEach
                 }
@@ -90,7 +82,7 @@ class Commands {
         sender.openInventory(inventory)
     }
 
-    @BaseCommand(usage = "[jogador] [mensagem]", aliases = ["sudo", "sumo"], desc = "Comando usado forçar o jogador a fazer algo", permission = Permission.SUDO_COMMAND, min = 2, max = 10)
+    @BaseCommand(usage = "[jogador] [mensagem]", aliases = ["sudo"], desc = "Comando usado forçar o jogador a fazer algo", permission = Permission.SUDO_COMMAND, min = 2, max = 10)
     fun sudoCommand(sender: CommandSender, commandLabel: String, strings: Array<String>) {
         if (sender !is Player) return
 
@@ -139,7 +131,8 @@ class Commands {
                     targetPlayer.showPlayer(targetPlayer)
             }
         } else {
-            sender.performCommand("admin cage ${targetPlayer.name}")
+            if (!targetPlayer.hasMetadata("caged"))
+                sender.performCommand("admin cage ${targetPlayer.name}")
 
             targetPlayer.setMetadata("screenshare", FixedMetadataValue(Main.instance, sender.name))
 
@@ -150,6 +143,9 @@ class Commands {
 
             for (onlinePlayer in Bukkit.getOnlinePlayers()) {
                 if (onlinePlayer == sender)
+                    continue
+
+                if (onlinePlayer == targetPlayer)
                     continue
 
                 targetPlayer.hidePlayer(onlinePlayer)
