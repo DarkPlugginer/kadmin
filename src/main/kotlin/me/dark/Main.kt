@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 21/03/18 20:15
+ * Modificado em: 23/03/18 12:23
  */
 
 package me.dark
@@ -15,16 +15,12 @@ import me.dark.commands.common.BaseCommandExecutor
 import me.dark.commands.common.CommandManager
 import me.dark.hack.listener.HackListener
 import me.dark.listener.PlayerListener
-import me.dark.sockets.ServerHandler
-import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
-import java.net.InetAddress
-import java.net.ServerSocket
 
 class Main : JavaPlugin() {
 
@@ -34,13 +30,8 @@ class Main : JavaPlugin() {
         var schematics: File? = null
     }
 
-    fun getStringInConfig(path: String): String {
-        if (config.getString(path).contains("&"))
-            return ChatColor.translateAlternateColorCodes('&', config.getString(path))
-        return config.getString(path)
-    }
-
     override fun onEnable() {
+
         instance = this
         val craftServer = server as CraftServer
         craftServer.commandMap.register("admin", BaseCommandExecutor())
@@ -60,6 +51,7 @@ class Main : JavaPlugin() {
         config.addDefault("Schematic.name", "jail.schematic")
         config.addDefault("Schematic.block", Material.QUARTZ_BLOCK.name)
         config.addDefault("Report", true)
+        config.addDefault("DefaultBan", true)
 
         config.options().copyDefaults(true)
         saveConfig()
@@ -71,7 +63,7 @@ class Main : JavaPlugin() {
 
         copyFile(getResource("schematics/jail.schematic"), File(dataFolder, "schematics/jail.schematic"))
 
-        Thread(ServerHandler(ServerSocket(21, 5, InetAddress.getLocalHost()))).start()
+        //Thread(ServerHandler(ServerSocket(21, 5, InetAddress.getLocalHost()))).start()
 
         super.onEnable()
     }

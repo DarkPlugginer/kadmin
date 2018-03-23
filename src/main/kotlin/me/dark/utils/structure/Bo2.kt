@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 22/03/18 18:50
+ * Modificado em: 23/03/18 08:47
  */
 
 package me.dark.utils.structure
@@ -13,7 +13,6 @@ import me.dark.Main
 import net.minecraft.server.v1_8_R3.BlockPosition
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld
@@ -25,7 +24,7 @@ import java.util.*
 
 class Bo2 {
 
-    fun addBlockUpdate(location: Location) {
+    private fun addBlockUpdate(location: Location) {
         blocksForUpdate.add(location)
     }
 
@@ -51,7 +50,7 @@ class Bo2 {
         val blocks = ArrayList<Block>()
         try {
             reader = BufferedReader(FileReader(file))
-            var line: String? = null
+            var line: String?
             while (reader.readLine() != null) {
                 line = reader.readLine()
 
@@ -78,7 +77,7 @@ class Bo2 {
         return blocks
     }
 
-    /* Load BO2 file */
+    /*
 
     fun load(location: Location, file: File): List<FutureBlock> {
         val reader: BufferedReader
@@ -107,27 +106,23 @@ class Bo2 {
 
         return blocks
     }
+    */
 
     /* Set methods */
 
-    fun setBlockFast(world: World, x: Int, y: Int, z: Int, blockId: Int, data: Byte): Boolean {
+    private fun setBlockFast(world: World, x: Int, y: Int, z: Int, blockId: Int, data: Byte): Boolean {
         if (y >= 255 || y < 0) {
             return false
         }
         val w = (world as CraftWorld).handle
-        val chunk = w.getChunkAt(x shr 4, z shr 4)
+        w.getChunkAt(x shr 4, z shr 4)
         addBlockUpdate(Location(Bukkit.getWorlds()[0], x.toDouble(), y.toDouble(), z.toDouble()))
         return true
     }
 
-    fun setBlockFast(location: Location, material: Material, data: Byte): Boolean {
-        return setBlockFast(location.world, location.blockX, location.blockY, location.blockZ, material.id, data)
-    }
-
     /* FutureBlock Utils */
 
-    inner class FutureBlock(val location: Location, val id: Int, val data: Byte) {
-
+    inner class FutureBlock(private val location: Location, val id: Int, val data: Byte) {
         fun place() {
             location.block.setTypeIdAndData(id, data, true)
         }

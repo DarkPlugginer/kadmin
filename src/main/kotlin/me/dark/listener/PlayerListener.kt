@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 22/03/18 18:50
+ * Modificado em: 23/03/18 12:25
  */
 
 package me.dark.listener
@@ -16,6 +16,7 @@ import me.dark.utils.enums.Permission
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.block.Block
+import org.bukkit.entity.Bat
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -27,9 +28,13 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.SkullMeta
 import org.bukkit.metadata.FixedMetadataValue
+import org.bukkit.scheduler.BukkitRunnable
+import org.bukkit.util.Vector
 import java.util.*
 
 object PlayerListener : Listener {
+
+    val inventory: HashMap<UUID, ArrayList<Array<out ItemStack>>> = HashMap()
 
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
@@ -135,12 +140,12 @@ object PlayerListener : Listener {
 
                     Bukkit.getOnlinePlayers().forEach { player1: Player? ->
                         if (!Main.adminManager.inAdmin(player1!!.uniqueId)) {
-                            var head = ItemStack(Material.SKULL_ITEM)
+                            val head = ItemStack(Material.SKULL_ITEM)
                             head.durability = 3.toShort()
-                            var meta = head.itemMeta as SkullMeta
+                            val meta = head.itemMeta as SkullMeta
                             meta.owner = player1.name
                             meta.displayName = "§a" + player1.name
-                            meta.lore = Arrays.asList("", "§fClique com o botao §c§o§nDireito §fPara teleportar", "", "§fClique com o botão esquerdo parar §c§o§nPrender")
+                            meta.lore = Arrays.asList("", "§fClique com o botao §c§oDireito §fPara teleportar", "", "§fClique com o botão esquerdo para §c§oPrender", "", "§fClique com o botão esquerdo + shift para §aSS")
                             head.itemMeta = meta
                             inventory.setItem(inventory.firstEmpty(), head)
                         }
@@ -198,6 +203,12 @@ object PlayerListener : Listener {
                 "§b§nJogadores" -> {
                     val clicked = Bukkit.getPlayerExact(currentItem.itemMeta.displayName.replace("§a", ""))
 
+                    if (event.isShiftClick) {
+                        player.performCommand("admin ss ${clicked.name}")
+                        player.closeInventory()
+                        return
+                    }
+
                     if (event.isLeftClick) {
                         player.teleport(clicked.location)
                     } else if (event.isRightClick) {
@@ -216,22 +227,44 @@ object PlayerListener : Listener {
                     val clicked = Bukkit.getPlayerExact(currentItem.itemMeta.displayName.replace("§a", ""))
                     val inventory = Bukkit.createInventory(player, 27, "§bReports §f- §nMotivos")
 
-                    inventory.setItem(10, createItem("§fReportar por: §b§nNoFall", "", Material.FEATHER, 0, false))
-                    inventory.setItem(12, createItem("§fReportar por: §b§nAutoSoup", "", Material.MUSHROOM_SOUP, 0, false))
-                    inventory.setItem(14, createItem("§fReportar por: §b§nForceField", "", Material.IRON_FENCE, 0, false))
-                    inventory.setItem(26, createItem("§fReportar por outro motivo", "", Material.REDSTONE, 0, false))
+                    inventory.setItem(10, createItem("§fReportar por: §b§nNoFall", "", Material.FEATHER, 0))
+                    inventory.setItem(12, createItem("§fReportar por: §b§nAutoSoup", "", Material.MUSHROOM_SOUP, 0))
+                    inventory.setItem(14, createItem("§fReportar por: §b§nForceField", "", Material.IRON_FENCE, 0))
+                    inventory.setItem(26, createItem("§fReportar por outro motivo", "", Material.REDSTONE, 0))
 
                     while (inventory.firstEmpty() != -1)
-                        inventory.setItem(inventory.firstEmpty(), createItem("§akAdmin", "", Material.STAINED_GLASS_PANE, 5, true))
+                        inventory.setItem(inventory.firstEmpty(), createItem("§akAdmin", "", Material.STAINED_GLASS_PANE, 5))
 
                     player.openInventory(inventory)
 
                     player.setMetadata("report", FixedMetadataValue(Main.instance, clicked.name))
                 }
 
+                "§c§nHack-Test §ePlayers" -> {
+                    player.closeInventory()
+
+                    val clicked = Bukkit.getPlayerExact(currentItem.itemMeta.displayName.replace("§a", ""))
+
+                    val inventory = Bukkit.createInventory(player, 27, "§c§nHack-Test §eHacks")
+
+                    inventory.setItem(10, createItem("§fTestar: §c§nNoFall", "", Material.FEATHER, 0))
+                    inventory.setItem(12, createItem("§fTestar: §c§nAutoSoup", "", Material.MUSHROOM_SOUP, 0))
+                    inventory.setItem(14, createItem("§fTestar: §c§nForceField", "", Material.IRON_FENCE, 0))
+
+                    while (inventory.firstEmpty() != -1)
+                        inventory.setItem(inventory.firstEmpty(), createItem("§akAdmin", "", Material.STAINED_GLASS_PANE, 14))
+
+                    player.setMetadata("htest", FixedMetadataValue(Main.instance, clicked))
+
+                    player.openInventory(inventory)
+                }
+
                 "§bReports §f- §nMotivos" -> {
+                    if (currentItem.type == Material.STAINED_GLASS_PANE)
+                        return
+
                     if (currentItem.type == Material.REDSTONE) {
-                        player.sendMessage("§fPor favor, especifique o §c§nmotivo §dfno chat")
+                        player.sendMessage("§fPor favor, especifique o §c§nmotivo §fno chat")
                         player.sendMessage(" ")
 
                         player.closeInventory()
@@ -257,6 +290,74 @@ object PlayerListener : Listener {
                     player.sendMessage("§fReport enviado com §bsucesso§f!")
                 }
 
+                "§c§nHack-Test §eHacks" -> {
+                    player.closeInventory()
+
+                    if (currentItem.type == Material.STAINED_GLASS_PANE)
+                        return
+
+                    val hack = currentItem.itemMeta.displayName.replace("§fTestar: §c§n", "").toLowerCase()
+                    val target = player.getMetadata("htest")[0].value() as Player
+
+                    when (hack) {
+                        "nofall" -> {
+                            target.setMetadata("nfall", FixedMetadataValue(Main.instance, true))
+                            target.velocity = Vector(0.0, 1.5, 0.0)
+                        }
+
+                        "autosoup" -> {
+                            val list: ArrayList<Array<out ItemStack>> = ArrayList()
+                            list.add(player.inventory.contents)
+                            list.add(player.inventory.armorContents)
+                            inventory[target.uniqueId] = list
+
+                            val health = target.health
+
+                            target.inventory.clear()
+                            target.updateInventory()
+                            target.damage(4.0)
+                            target.health = 20.0
+
+                            target.inventory.setItem(Random().nextInt(target.inventory.size), ItemStack(Material.MUSHROOM_SOUP))
+
+                            object : BukkitRunnable() {
+                                override fun run() {
+                                    if (target.inventory.contains(Material.MUSHROOM_SOUP)) {
+                                        player.sendMessage("§c§nHack-Test §e> §fO jogador §c${target.name} §fNão aparenta estar usando auto-soup")
+                                    } else {
+                                        player.sendMessage("§c§nHack-Test §e> §fO jogador §c${target.name} §fPode estar usando auto-soup")
+                                        player.performCommand("admin cage ${target.name}}")
+                                    }
+
+                                    target.health = health
+                                    target.inventory.contents = inventory[target.uniqueId]!![0]
+                                    target.inventory.armorContents = inventory[target.uniqueId]!![1]
+
+                                    target.updateInventory()
+                                }
+                            }.runTaskLater(Main.instance, 20L)
+                        }
+
+                        "forcefield" -> {
+                            val bat = player.world.spawn(target.location.subtract(1.0, 0.0, 1.0), Bat::class.java)
+                            bat.health = (bat.maxHealth - bat.maxHealth) + 1.0
+
+                            object : BukkitRunnable() {
+                                override fun run() {
+                                    if (bat.isDead) {
+                                        player.sendMessage("§c§nHack-Test §e> §fO jogador §c${target.name} §fPode estar usando force-field")
+                                        player.performCommand("admin cage ${target.name}}")
+                                    } else {
+                                        player.sendMessage("§c§nHack-Test §e> §fO jogador §c${target.name} §fNão aparenta estar usando force-field")
+                                    }
+                                }
+                            }.runTaskLater(Main.instance, 20L)
+                        }
+                    }
+
+                    player.removeMetadata("htest", Main.instance)
+                }
+
                 else -> {
                 }
             }
@@ -271,6 +372,9 @@ object PlayerListener : Listener {
             event.isCancelled = true
             player.updateInventory()
         }
+
+        if (player.hasMetadata("screenshare"))
+            event.isCancelled = true
     }
 
     @EventHandler
@@ -281,13 +385,24 @@ object PlayerListener : Listener {
             event.isCancelled = true
             player.updateInventory()
         }
+
+        if (player.hasMetadata("screenshare"))
+            event.isCancelled = true
     }
 
-    private fun createItem(name: String, desc: String, type: Material, id: Int, hasId: Boolean): ItemStack {
-        var stack = ItemStack(type)
-        if (hasId)
+    @EventHandler
+    fun onPlayerPickUpItem(event: PlayerPickupItemEvent) {
+        val player = event.player
+
+        if (player.hasMetadata("screenshare"))
+            event.isCancelled = true
+    }
+
+    private fun createItem(name: String, desc: String, type: Material, id: Int): ItemStack {
+        val stack = ItemStack(type)
+        if (id > 0)
             stack.durability = id.toShort()
-        var meta: ItemMeta? = stack.itemMeta
+        val meta: ItemMeta? = stack.itemMeta
         meta?.displayName = name
         meta?.lore = Arrays.asList(desc)
         meta?.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_PLACED_ON)

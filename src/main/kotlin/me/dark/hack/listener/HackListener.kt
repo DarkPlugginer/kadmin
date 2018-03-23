@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 20/03/18 13:20
+ * Modificado em: 23/03/18 12:25
  */
 
 package me.dark.hack.listener
@@ -64,7 +64,11 @@ object HackListener : Listener {
             autoSoupCheck!!.setLastInteract()
 
             if (!autoSoupCheck.isLegit(AutoSoupCheck.CheckMoment.INTERACT)) {
-                BanAPI().addBan(player.name, Bukkit.getServer().consoleSender, null, "§fUso de §c§n§oHACK §fAUTO-SOUP")
+                if (Main.instance!!.config.getBoolean("DefaultBan")) {
+                    BanAPI().addBan(player.name, Bukkit.getServer().consoleSender, null, "§fUso de §c§n§oHACK §fAUTO-SOUP")
+                } else {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban ${player.name} Uso de HACK AUTO-SOUP")
+                }
                 player.kickPlayer("§cVocê foi banido!" + System.getProperty("line.separator") + "§cMotivo: §fUso de §c§n§oHACK §fAUTO-SOUP")
             }
         }
@@ -80,7 +84,11 @@ object HackListener : Listener {
             autoSoupCheck!!.setHeld()
 
             if (!autoSoupCheck.isLegit(AutoSoupCheck.CheckMoment.HELD)) {
-                BanAPI().addBan(player.name, Bukkit.getServer().consoleSender, null, "§fUso de §c§n§oHACK §fAUTO-SOUP")
+                if (Main.instance!!.config.getBoolean("DefaultBan")) {
+                    BanAPI().addBan(player.name, Bukkit.getServer().consoleSender, null, "§fUso de §c§n§oHACK §fAUTO-SOUP")
+                } else {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban ${player.name} Uso de HACK AUTO-SOUP")
+                }
                 player.kickPlayer("§cVocê foi banido!" + System.getProperty("line.separator") + "§cMotivo: §fUso de §c§n§oHACK §fAUTO-SOUP")
             }
         }
@@ -98,7 +106,11 @@ object HackListener : Listener {
         if (player is Player) {
             if (player.hasMetadata("nfall") && event.cause == EntityDamageEvent.DamageCause.FALL) {
                 if (event.damage < 3.0) {
-                    BanAPI().addBan(player.name, Bukkit.getServer().consoleSender, null, "§fUso de §c§n§oHACK §fAUTO-SOUP")
+                    if (Main.instance!!.config.getBoolean("DefaultBan")) {
+                        BanAPI().addBan(player.name, Bukkit.getServer().consoleSender, null, "Uso de HACK AUTO-SOUP")
+                    } else {
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban ${player.name} Uso de HACK No-Fall")
+                    }
                     player.kickPlayer("§cVocê foi banido!" + System.getProperty("line.separator") + "§cMotivo: §fUso de §c§n§oHACK §fnNo-Fall")
                 } else {
                     player.removeMetadata("nfall", Main.instance)

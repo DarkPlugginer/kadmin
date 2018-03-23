@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 22/03/18 18:50
+ * Modificado em: 23/03/18 12:25
  */
 
 package me.dark.commands
@@ -20,6 +20,8 @@ import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.SkullMeta
 import org.bukkit.metadata.FixedMetadataValue
 import java.io.File
 import java.util.*
@@ -77,7 +79,27 @@ class Commands {
         val targetPlayer: Player = Bukkit.getPlayerExact(strings[0])
         sender.setMetadata("hacktest", FixedMetadataValue(Main.instance, targetPlayer))
 
-        val inventory = Bukkit.createInventory(sender, 36, "§b§nHack-Test")
+        var slots = 0
+
+        when {
+            Bukkit.getOnlinePlayers().size <= 27 -> slots = 27
+            Bukkit.getOnlinePlayers().size in 28..36 -> slots = 36
+            Bukkit.getOnlinePlayers().size in 37..55 -> slots = 54
+        }
+
+        val inventory = Bukkit.createInventory(sender, slots, "§c§nHack-Test §ePlayers")
+
+        Bukkit.getOnlinePlayers().forEach { player1: Player? ->
+            if (!Main.adminManager.inAdmin(player1!!.uniqueId) && player1 != sender) {
+                val head = ItemStack(Material.SKULL_ITEM)
+                head.durability = 3.toShort()
+                val meta = head.itemMeta as SkullMeta
+                meta.owner = player1.name
+                meta.displayName = "§a" + player1.name
+                head.itemMeta = meta
+                inventory.setItem(inventory.firstEmpty(), head)
+            }
+        }
 
         sender.openInventory(inventory)
     }

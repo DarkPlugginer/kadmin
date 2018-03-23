@@ -4,7 +4,7 @@
  * Projeto desenvolvido por Miguel Lukas
  * Todos os direitos Reservados
  *
- * Modificado em: 19/03/18 20:31
+ * Modificado em: 23/03/18 08:40
  */
 
 package me.dark
@@ -84,8 +84,8 @@ class AdminManager {
     }
 
     private fun createItem(name: String, desc: String, type: Material): ItemStack {
-        var stack = ItemStack(type)
-        var meta: ItemMeta? = stack.itemMeta
+        val stack = ItemStack(type)
+        val meta: ItemMeta? = stack.itemMeta
         meta?.displayName = name
         meta?.lore = Arrays.asList(desc)
         meta?.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_PLACED_ON)
